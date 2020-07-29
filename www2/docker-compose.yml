@@ -1,0 +1,55 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - 8082:3306
+    volumes:
+      - /root/webpages/www2/mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_USER: crackmaster
+      MYSQL_ROOT_PASSWORD: Crackmaster.
+      MYSQL_DATABASE: wordpress
+      MYSQL_PASSWORD: Crackmaster.
+    networks:
+      - backend
+
+  phpmyadmin:
+     image: phpmyadmin/phpmyadmin:latest
+     ports:
+       - 8085:80
+     environment:
+       - PMA_ARBITRARY= 1
+       - PMA_HOST=mysql
+     depends_on:
+      - mysql
+     networks:
+      - backend
+  wordpress:
+    depends_on:
+      - mysql
+    image: wordpress
+    ports:
+      - 8083:80
+    restart: always
+    volumes:
+      - ./:/var/www/html
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+    environment:
+      VIRTUAL_HOST: capacitacion.crackmasternet.com
+      VIRTUAL_PORT: 8083
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: crackmaster
+      WORDPRESS_DB_PASSWORD: Crackmaster.
+    networks:
+      - frontend
+      - backend
+
+volumes:
+  mysql-data:
+networks:
+  backend:
+  frontend:
+    external:
+      name: proxy
